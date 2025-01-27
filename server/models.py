@@ -2,16 +2,19 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from sqlalchemy_serializer import SerializerMixin
 
+# Define metadata with naming conventions
 metadata = MetaData(naming_convention={
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
 })
 
+# Initialize the database instance
 db = SQLAlchemy(metadata=metadata)
 
 class Bakery(db.Model, SerializerMixin):
     __tablename__ = 'bakeries'
 
-    serialize_rules = ('-baked_goods.bakery',)
+    # serialize_rules ensures we don't serialize unwanted attributes
+    serialize_rules = ('-baked_goods.bakery',)  # Exclude the nested baked goods when serializing
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
@@ -26,7 +29,8 @@ class Bakery(db.Model, SerializerMixin):
 class BakedGood(db.Model, SerializerMixin):
     __tablename__ = 'baked_goods'
 
-    serialize_rules = ('-bakery.baked_goods',)
+    # serialize_rules ensures we don't serialize unwanted attributes
+    serialize_rules = ('-bakery.baked_goods',)  # Exclude the nested bakery when serializing
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
